@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,31 +14,71 @@
 <meta name="description" content="老司机福利导航（laosiji.men）是一个非盈利性的网站，建设于2023年，自网站建立以来始终坚持“纯净·实用·无广告·用户体验至上”的理念赢得到用户的广泛认可，在业界享有盛誉。" />
 <link rel="shortcut icon" href="favicon.ico">
     <style type="text/css" media="screen">
-        body{background: url(https://shipin.neocities.org/bg.jpg) repeat;background-color: #F5EFE0;margin: 0;padding: 0;font-size: 14px;font-family: "Microsoft JhengHei",sans-serif;color:#999;;}
+        body{background: url(jiandan/bg.jpg) repeat;background-color: #F5EFE0;margin: 0;padding: 0;font-size: 14px;color:#999;;}
         #main{background-color: #F5EFE0;max-width:880px;width:90%;margin:10px auto;border:4px solid #222;border-radius:5px}
         .desc{background-color: #c0b6a0;text-align:center;padding:10px;color: #222;font-size:16px;letter-spacing:1px;}
         .content{padding:10px 20px;color:#555;line-height: 160%;}
-		.content h1{font-size:1.8em;}
-		.content li{list-style:none;margin: 9px 0;text-align: center;}
-.content li a{color:#000;background: #EEE;padding: 10px;display: block;border-radius: 20px;text-decoration: none;}
-.content li a:hover{color:#000;background: #EEE;}
-		.content p.chain{font-size: 12px;color: #00877a}
-        .content p.chain small{font-size:11px;color:#999999}
-        .content p.chain small a{font-size:11px;color:#999999}
-        .content p a{color:#FF5722;cursor:pointer}
-        .content p a:hover{color: #00877a}
+
+
         .list{margin:10px;text-align:center;color: #00877a;}
         .list span{color: #FF5722;}
         .domp{background-color: #FF9900;padding:10px;text-align:center;color:#fff;}
+		  .field .title{margin-bottom:9px;font-weight:100%;text-align: center;color:#343a40}
+      a,a:active,a:focus,a:hover,a:visited{color:inherit;text-decoration:none}
+      .brand{display:flex;align-items:center;justify-content:flex-start;text-align:center;color:#000;font-size:30px;font-weight:200;padding:20px;cursor:pointer}
+      .brand span{color:#fff;font-weight:600}
+      .brand span.flag{color:#FF9900;background:#fff;border-radius:6px;font-size:20px;font-weight:100%;display:inline-block;padding:0 5px;margin-left:5px}
+      .enter-maomi{width:100%;text-align:center;line-height:40px;border:1px solid #FF9900;border-radius:4px;margin-bottom:20px;margin-top:10px}
+      .enter-icon{width:5%;height:41px;float:left;margin-right:5px;background-color:#FF9900}
+      .enter-ping{width:15%;height:41px;float:right;background-color:#FF9900}
+      .enter-link a{display:block}
+      .icon{width:20px;height:20px;background-position:center;background-size:contain;background-repeat:no-repeat;display:inline-block}
+      .icon_hand{width:27px;height:27px;vertical-align:middle;background-image:url(data:image/png;base64,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);padding-top:12px}
+      .c_black{color:#333;line-height:30px;font-size:12px}
+      .c_blue{color:#00c250}
+
+      .text-white{color: #fff;}
     </style>
 </head>
 <body>
     <div id="main">
-        <div class="desc"><img src="1.png" alt="app" /></a></div>
+        <div class="desc"><img src="jiandan/logo.png" alt="app" /></a></div>
         <div class="content">
-		<li><a href="https://laosiji.my/" target="_blank">「 最新域名 」www.laosiji.my</a></li> 
-		<li><a href="https://lsj.my/" target="_blank">「 最新域名 」www.lsj.my</a></li> 
-        <li><a href="https://laosiji.men/" target="_blank">「 发布地址 」www.laosiji.men</a></li> 
+		 <div class="field">
+        <div class="enter-maomi">
+          <div class="enter-icon">
+            <div class="icon icon_hand"></div>
+          </div>
+          <div class="enter-ping">
+            <span class="text-white">0 ms</span>
+          </div>
+          <div class="enter-link">
+            <a href="https://www.laosiji.my" target="_blank">最新域名： <span class="c_blue">www.laosiji.my</span> </a>
+          </div>
+        </div>        <div class="enter-maomi">
+          <div class="enter-icon">
+            <div class="icon icon_hand"></div>
+          </div>
+          <div class="enter-ping">
+            <span class="text-white">0 ms</span>
+          </div>
+          <div class="enter-link">
+            <a href="https://www.lsj.my" target="_blank">跳转域名: <span class="c_blue">www.lsj.my</span> </a>
+          </div>
+        </div>        <div class="enter-maomi">
+          <div class="enter-icon">
+            <div class="icon icon_hand"></div>
+          </div>
+          <div class="enter-ping">
+            <span class="text-white">0 ms</span>
+          </div>
+          <div class="enter-link">
+            <a href="https://www.laosiji.men" target="_blank">永久域名: <span class="c_blue">www.laosiji.men</span> </a>
+          </div>
+        </div>
+		
+		</div>
+		
 
         </div>
         <div class="desc">「 未 來 已 來 」</div>
@@ -52,7 +93,27 @@
         </div>
         <div class="list">發送888到 <span>laosijimen@gmail.com</span> 獲取新網址</div>
         <div class="domp">2012-2022 &copy; 老司机福利导航</div>
-    </div>
+    </div>   
+	<script language="javascript">
+
+
+      // 原有ping值检测代码
+      var tim = 1;
+      setInterval("tim++",100);
+      obj = document.querySelectorAll('.enter-link a');
+      sbj = document.querySelectorAll('.enter-ping span');
+      for(var i = 0;i < obj.length; i++){
+        var pobj = document.querySelector('.field');
+        var img = document.createElement('img');
+        img.setAttribute('src', obj[i].href + '/' + Math.random());
+        img.setAttribute('onerror', 'uomg("' + i + '")');
+        img.setAttribute('style', 'display:none');
+        pobj.appendChild(img);
+      }
+      function uomg(index){
+        console.log(sbj[index]);
+        sbj[index].innerText = tim * 10 + 'ms';
+      }</script>
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript" >
    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};

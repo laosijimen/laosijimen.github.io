@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单图片上传工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            background-color: #f5f5f5;
+        }
+        .upload-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 2rem;
+            transition: border-color 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #007bff;
+        }
+        #file-input {
+            display: none;
+        }
+        .upload-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 1rem;
+        }
+        .upload-btn:hover {
+            background-color: #0056b3;
+        }
+        .preview-container {
+            margin-top: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .preview-card {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .preview-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .preview-info {
+            padding: 0.8rem;
+            background: white;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .empty-state {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-container">
+        <h1>简单图片上传工具</h1>
+        
+        <!-- 上传区域 -->
+        <div class="upload-area" id="upload-area">
+            <p>点击或拖拽图片到此处上传</p>
+            <button class="upload-btn" onclick="document.getElementById('file-input').click()">选择图片</button>
+            <input type="file" id="file-input" accept="image/*" multiple onchange="handleFileSelect(event)">
+        </div>
+
+        <!-- 图片预览区域 -->
+        <div class="preview-container" id="preview-container">
+            <div class="empty-state" id="empty-state">
+                暂无上传的图片
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 存储图片数据的数组
+        let uploadedImages = JSON.parse(localStorage.getItem('uploadedImages')) || [];
+
+        // 页面加载时渲染已上传的图片
+        document.addEventListener('DOMContentLoaded', renderImages);
+
+        // 处理文件选择
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (!files.length) return;
+
+            // 遍历选择的文件
+            for (const file of files) {
+                if (!file.type.startsWith('image/')) continue;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // 创建图片对象
+                    const imageData = {
+                        id: Date.now() + Math.random(),
+                        name: file.name,
+                        size: formatFileSize(file.size),
+                        src: e.target.result
+                    };
+
+                    // 添加到数组并保存到本地存储
+                    uploadedImages.push(imageData);
+                    saveToLocalStorage();
+                    renderImages();
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // 清空文件输入
+            event.target.value = '';
+        }
+
+        // 拖拽上传处理
+        const uploadArea = document.getElementById('upload-area');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#007bff';
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#ccc';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ccc';
+            
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                // 模拟文件输入事件
+                const fileInput = document.getElementById('file-input');
+                const dataTransfer = new DataTransfer();
+                for (const file of files) {
+                    dataTransfer.items.add(file);
+                }
+                fileInput.files = dataTransfer.files;
+                handleFileSelect({ target: fileInput });
+            }
+        });
+
+        // 渲染图片列表
+        function renderImages() {
+            const previewContainer = document.getElementById('preview-container');
+            const emptyState = document.getElementById('empty-state');
+
+            // 清空容器
+            previewContainer.innerHTML = '';
+
+            // 如果没有图片，显示空状态
+            if (uploadedImages.length === 0) {
+                previewContainer.appendChild(emptyState);
+                return;
+            }
+
+            // 渲染每张图片
+            uploadedImages.forEach(image => {
+                const card = document.createElement('div');
+                card.className = 'preview-card';
+                card.innerHTML = `
+                    <img src="${image.src}" alt="${image.name}" class="preview-img">
+                    <div class="preview-info">
+                        <p><strong>文件名：</strong>${image.name}</p>
+                        <p><strong>大小：</strong>${image.size}</p>
+                        <button class="delete-btn" onclick="deleteImage(${image.id})">删除</button>
+                    </div>
+                `;
+                previewContainer.appendChild(card);
+            });
+        }
+
+        // 删除图片
+        function deleteImage(id) {
+            if (confirm('确定要删除这张图片吗？')) {
+                uploadedImages = uploadedImages.filter(img => img.id !== id);
+                saveToLocalStorage();
+                renderImages();
+            }
+        }
+
+        // 保存到本地存储
+        function saveToLocalStorage() {
+            localStorage.setItem('uploadedImages', JSON.stringify(uploadedImages));
+        }
+
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html>

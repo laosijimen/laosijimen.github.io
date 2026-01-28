@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>真实地址图片管理（无Base64）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            background-color: #f5f5f5;
+        }
+        .upload-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+        .upload-group {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .upload-group label {
+            font-weight: 600;
+            color: #333;
+        }
+        .url-input {
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            font-size: 1rem;
+        }
+        .upload-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+        .upload-btn:hover {
+            background-color: #0056b3;
+        }
+        .tip {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* 你指定的导航卡片样式（完全保留） */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+        .grid-item {
+            text-decoration: none;
+            color: #333;
+        }
+        .app-grid-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .app-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+        }
+        .app-icon-wrapper-purple {
+            background-color: #e8e0f5;
+        }
+        .app-favicon {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .app-name {
+            font-size: 0.9rem;
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .empty-state {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+            grid-column: 1 / -1;
+        }
+        .real-url {
+            font-size: 0.7rem;
+            color: #007bff;
+            margin-top: 0.3rem;
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .del-btn {
+            font-size: 0.8rem;
+            color: #dc3545;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            margin-top: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-container">
+        <h1>真实地址图片管理（无Base64）</h1>
+
+        <!-- 方式1：输入网络图片真实URL -->
+        <div class="upload-group">
+            <label>网络图片真实URL（推荐）</label>
+            <input type="text" class="url-input" id="img-url" placeholder="示例：https://xxx.com/xxx.jpg/png/gif">
+            <button class="upload-btn" onclick="addUrlImage()">添加网络图片</button>
+            <p class="tip">提示：支持公网可访问的图片URL，直接读取真实地址，不做任何转换</p>
+        </div>
+
+        <!-- 方式2：选择本地图片（显示本地真实路径） -->
+        <div class="upload-group">
+            <label>本地图片（显示真实本地路径）</label>
+            <input type="file" id="local-file" accept="image/*" multiple onchange="addLocalImage(event)">
+            <p class="tip">提示：本地图片仅在你的设备上可预览，显示真实本地文件路径</p>
+        </div>
+    </div>
+
+    <!-- 你的指定卡片结构：图片展示区域 -->
+    <div class="grid-container" id="preview-container">
+        <div class="empty-state" id="empty-state">
+            暂无图片，添加后将显示真实地址
+        </div>
+    </div>
+
+    <script>
+        // 存储图片信息：仅存真实地址+文件名，无Base64
+        let imgList = JSON.parse(localStorage.getItem('realUrlImgList')) || [];
+        
+        // 页面加载渲染图片
+        document.addEventListener('DOMContentLoaded', renderImgList);
+
+        // 1. 添加网络图片（直接用真实URL）
+        function addUrlImage() {
+            const url = document.getElementById('img-url').value.trim();
+            if (!url) {
+                alert('请输入有效的图片URL！');
+                return;
+            }
+            // 简单校验图片格式
+            const imgReg = /\.(jpg|jpeg|png|gif|webp|svg)$/i;
+            if (!imgReg.test(url)) {
+                alert('请输入jpg/png/gif等格式的图片URL！');
+                return;
+            }
+            // 提取文件名
+            const fileName = url.split('/').pop().split('?')[0] || '网络图片';
+            // 存入真实地址，不做任何转换
+            const imgData = {
+                id: Date.now() + Math.random(),
+                name: fileName,
+                realUrl: url,
+                type: 'network' // 标记类型：网络/本地
+            };
+            imgList.push(imgData);
+            saveToLocal();
+            renderImgList();
+            document.getElementById('img-url').value = ''; // 清空输入框
+        }
+
+        // 2. 添加本地图片（获取真实本地路径）
+        function addLocalImage(e) {
+            const files = e.target.files;
+            if (!files.length) return;
+            for (let file of files) {
+                // 本地图片真实路径（仅本地有效）
+                const localRealUrl = URL.createObjectURL(file); // 本地真实访问地址，非Base64
+                const imgData = {
+                    id: Date.now() + Math.random(),
+                    name: file.name,
+                    realUrl: localRealUrl,
+                    type: 'local'
+                };
+                imgList.push(imgData);
+            }
+            saveToLocal();
+            renderImgList();
+            e.target.value = ''; // 清空文件选择
+        }
+
+        // 渲染图片（用你指定的<a>卡片结构）
+        function renderImgList() {
+            const container = document.getElementById('preview-container');
+            const emptyState = document.getElementById('empty-state');
+            container.innerHTML = '';
+
+            // 无图片显示空状态
+            if (imgList.length === 0) {
+                container.appendChild(emptyState);
+                return;
+            }
+
+            // 遍历渲染：完全用你指定的结构
+            imgList.forEach(img => {
+                const link = document.createElement('a');
+                link.href = img.realUrl; // 跳转指向真实地址
+                link.className = "grid-item app-grid-item";
+                link.target = "_blank"; // 新窗口打开
+                
+                // 卡片内容：和你给的结构一致，新增真实地址展示
+                link.innerHTML = `
+                    <div class="app-icon-wrapper app-icon-wrapper-purple">
+                        <img class="lazy-load app-favicon" src="${img.realUrl}" data-src="${img.realUrl}" alt="${img.name}">
+                    </div>
+                    <div class="app-name">${img.name}</div>
+                    <div class="real-url" title="${img.realUrl}">真实地址：${img.realUrl}</div>
+                    <button class="del-btn" onclick="delImg('${img.id}', event)">删除</button>
+                `;
+                container.appendChild(link);
+            });
+        }
+
+        // 删除图片
+        function delImg(id, e) {
+            e.preventDefault(); // 阻止跳转
+            if (confirm('确定删除这张图片吗？')) {
+                imgList = imgList.filter(item => item.id !== id);
+                saveToLocal();
+                renderImgList();
+            }
+        }
+
+        // 保存到本地存储（仅存真实地址，体积极小）
+        function saveToLocal() {
+            localStorage.setItem('realUrlImgList', JSON.stringify(imgList));
+        }
+    </script>
+</body>
+</html>
